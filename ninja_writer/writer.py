@@ -3,6 +3,8 @@ from typing import List, Dict
 from bp_parser.ast import BpModule
 from bp_parser.globber import resolve_globs
 
+DEBUG = True
+
 def resolve_filegroups(modules: List[BpModule], module_map: Dict[str, BpModule]):
     filegroup_map = {
         m.name: m.props.get("srcs", [])
@@ -42,6 +44,9 @@ def write_ninja(modules: List[BpModule], out_dir: str, base_path: str):
             srcs = resolve_globs(props.get("srcs", []), base_path=base_path)
             objs = []
 
+            if DEBUG:
+                print(f"[DEBUG] Processing module: {name} ({mtype})")
+
             if mtype.startswith("prebuilt_"):
                 if "src" in props:
                     f.write(f"build {os.path.join(out_dir, name)}: phony {os.path.realpath(props['src'])}\n")
@@ -73,12 +78,17 @@ def write_ninja(modules: List[BpModule], out_dir: str, base_path: str):
 
         for m in modules:
             if m.type != "cc_binary":
+                if DEBUG:
+                    print(f"[DEBUG] Skipping non-binary: {m.name} ({m.type})")
                 continue
 
             name = m.name
             props = m.props
             srcs = resolve_globs(props.get("srcs", []), base_path=base_path)
             objs = []
+
+            if DEBUG:
+                print(f"[DEBUG] Generating cc_binary: {name}")
 
             for src in srcs:
                 rel_src = os.path.relpath(src, base_path)
