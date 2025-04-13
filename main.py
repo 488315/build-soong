@@ -30,7 +30,7 @@ def main():
     # Run ninja
     print("[+] Running ninja build...")
     try:
-        subprocess.run(["/bin/bash", "-c", f"ninja -C {out_dir}"], check=True)
+        subprocess.run(["/bin/bash", "-c", f"NINJA_STATUS='' ninja -C {out_dir}"], check=True)
     except subprocess.CalledProcessError:
         print("❌ Ninja build failed.")
         sys.exit(1)
