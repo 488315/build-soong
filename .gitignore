@@ -1,0 +1,28 @@
+# Build output
+/out/
+*.o
+*.a
+*.so
+
+# Ninja state files
+.ninja_log
+.ninja_deps
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Temporary/test artifacts
+*.log
+*.tmp
+*.bak
+
+# OS-specific
+.DS_Store
+Thumbs.db

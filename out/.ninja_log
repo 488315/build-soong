@@ -1,0 +1,6 @@
+# ninja log v6
+0	13	1744504892896881310	/home/kjones/Documents/git_projects/android_bp_to_ninja/out/obj/libcore/core/utils.o	41f9c4aaef6afe69
+13	40	1744504892911108841	/home/kjones/Documents/git_projects/android_bp_to_ninja/out/liblibcore.so	1887d9235360fe42
+1	9	1744504909199958779	/home/kjones/Documents/git_projects/android_bp_to_ninja/out/liblibcore.a	45974a03cb4c1e98
+0	20	1744505385259103725	/home/kjones/Documents/git_projects/android_bp_to_ninja/out/libcore.a	34c6811bcb3298f0
+1	36	1744505385260103726	/home/kjones/Documents/git_projects/android_bp_to_ninja/out/libcore.so	72edf219ad04576a

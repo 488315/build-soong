@@ -1,0 +1,26 @@
+filegroup {
+    name: "common_srcs",
+    srcs: ["common/**/*.c"],
+}
+
+cc_library {
+    name: "libcore",
+    srcs: [":common_srcs", "core/utils.c"],
+}
+
+cc_static_library {
+    name: "libhelper",
+    srcs: ["helper/*.c"],
+}
+
+prebuilt_etc {
+    name: "config_blob",
+    src: "etc/default.conf",
+}
+
+cc_binary {
+    name: "mytool",
+    srcs: ["main.c"],
+    static_libs: ["libcore", "libhelper"],
+    shared_libs: [],
+}

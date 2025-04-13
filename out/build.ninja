@@ -1,0 +1,16 @@
+rule cc
+  command = clang -c $in -o $out
+
+rule ar
+  command = llvm-ar rcs $out $in
+
+rule shared
+  command = clang -shared $in -o $out
+
+rule link
+  command = clang $in $libs -o $out -L/home/kjones/Documents/git_projects/android_bp_to_ninja/out
+
+build /home/kjones/Documents/git_projects/android_bp_to_ninja/out/obj/libcore/core/utils.o: cc /home/kjones/Documents/git_projects/android_bp_to_ninja/examples/core/utils.c
+build /home/kjones/Documents/git_projects/android_bp_to_ninja/out/libcore.a: ar /home/kjones/Documents/git_projects/android_bp_to_ninja/out/obj/libcore/core/utils.o
+build /home/kjones/Documents/git_projects/android_bp_to_ninja/out/libcore.so: shared /home/kjones/Documents/git_projects/android_bp_to_ninja/out/obj/libcore/core/utils.o
+
