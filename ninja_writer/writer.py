@@ -22,6 +22,9 @@ def resolve_filegroups(modules: List[BpModule], module_map: Dict[str, BpModule])
                     resolved.append(s)
             m.props["srcs"] = resolved
 
+def wrap_bash_command(command: str) -> str:
+    return f"/bin/bash -c \"{command}\""
+
 def write_ninja(modules: List[BpModule], out_dir: str, base_path: str):
     out_dir = os.path.realpath(out_dir)
     base_path = os.path.realpath(base_path)
@@ -32,10 +35,14 @@ def write_ninja(modules: List[BpModule], out_dir: str, base_path: str):
     built_libs = {}
 
     with open(ninja_path, "w") as f:
-        f.write("rule cc\n  command = clang -c $in -o $out\n\n")
-        f.write("rule ar\n  command = llvm-ar rcs $out $in\n\n")
-        f.write("rule shared\n  command = clang -shared $in -o $out\n\n")
-        f.write(f"rule link\n  command = clang $in $libs -o $out -L{out_dir}\n\n")
+        f.write("rule cc\n")
+        f.write("  command = " + wrap_bash_command("clang -MD -MF $out.d -c $in -o $out") + "\n")
+        f.write("  deps = gcc\n")
+        f.write("  depfile = $out.d\n\n")
+
+        f.write("rule ar\n  command = " + wrap_bash_command("llvm-ar rcs $out $in") + "\n\n")
+        f.write("rule shared\n  command = " + wrap_bash_command("clang -shared $in -o $out") + "\n\n")
+        f.write("rule link\n  command = " + wrap_bash_command(f"clang $in $libs -o $out -L{out_dir}") + "\n\n")
 
         for m in modules:
             mtype = m.type
