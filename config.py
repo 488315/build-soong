@@ -10,7 +10,9 @@ class Config:
         self.keep_going = int(os.getenv("NINJA_KEEP_GOING", "1"))
         self.parallel = int(os.getenv("NINJA_JOBS", os.cpu_count()))
         self.combined_ninja_file = os.path.join(self.out_dir, "build.ninja")
-        self.ninja_command = os.getenv("NINJA_BACKEND", "ninja")  # "ninja", "n2", or "siso"
+        self.ninja_command = os.getenv(
+            "NINJA_BACKEND", "ninja"
+        )  # "ninja", "n2", or "siso"
         self.dist_dir = os.path.join(self.out_dir, "dist")
         self.soong_out_dir = self.out_dir
         self.heartbeat_interval = int(os.getenv("NINJA_HEARTBEAT_INTERVAL", "300"))

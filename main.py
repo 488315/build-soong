@@ -12,6 +12,7 @@ from config import Config
 
 sys.dont_write_bytecode = True  # Prevent writing .pyc files
 
+
 def main():
     bp_file = "examples/Android.bp"
     out_dir = "out"
@@ -33,9 +34,9 @@ def main():
         sys.exit(1)
 
     writer.write_ninja(modules, out_dir, base_dir)
-    
-    #print(f"✅ build.ninja generated at {out_dir}/build.ninja")
-    #print("[+] Running ninja build with ninja.py...")
+
+    # print(f"✅ build.ninja generated at {out_dir}/build.ninja")
+    # print("[+] Running ninja build with ninja.py...")
 
     config = Config(out_dir)
     ninja_runner = NinjaRunner(config, None)

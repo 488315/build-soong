@@ -5,10 +5,10 @@ from bp_parser.globber import resolve_globs
 
 DEBUG = True
 
+
 def resolve_filegroups(modules: List[BpModule], module_map: Dict[str, BpModule]):
     filegroup_map = {
-        m.name: m.props.get("srcs", [])
-        for m in modules if m.type == "filegroup"
+        m.name: m.props.get("srcs", []) for m in modules if m.type == "filegroup"
     }
 
     for m in modules:
@@ -22,8 +22,10 @@ def resolve_filegroups(modules: List[BpModule], module_map: Dict[str, BpModule])
                     resolved.append(s)
             m.props["srcs"] = resolved
 
+
 def wrap_bash_command(command: str) -> str:
-    return f"/bin/bash -c \"{command}\""
+    return f'/bin/bash -c "{command}"'
+
 
 def write_ninja(modules: List[BpModule], out_dir: str, base_path: str):
     out_dir = os.path.realpath(out_dir)
@@ -36,13 +38,27 @@ def write_ninja(modules: List[BpModule], out_dir: str, base_path: str):
 
     with open(ninja_path, "w") as f:
         f.write("rule cc\n")
-        f.write("  command = " + wrap_bash_command("clang -MD -MF $out.d -c $in -o $out") + "\n")
-        f.write("  deps = gcc\n")
+        f.write(
+            "  command = "
+            + wrap_bash_command("clang -MD -MF $out.d -c $in -o $out")
+            + "\n"
+        )
+        f.write("  deps = clang\n")
         f.write("  depfile = $out.d\n\n")
 
-        f.write("rule ar\n  command = " + wrap_bash_command("llvm-ar rcs $out $in") + "\n\n")
-        f.write("rule shared\n  command = " + wrap_bash_command("clang -shared $in -o $out") + "\n\n")
-        f.write("rule link\n  command = " + wrap_bash_command(f"clang $in $libs -o $out -L{out_dir}") + "\n\n")
+        f.write(
+            "rule ar\n  command = " + wrap_bash_command("llvm-ar rcs $out $in") + "\n\n"
+        )
+        f.write(
+            "rule shared\n  command = "
+            + wrap_bash_command("clang -shared $in -o $out")
+            + "\n\n"
+        )
+        f.write(
+            "rule link\n  command = "
+            + wrap_bash_command(f"clang $in $libs -o $out -L{out_dir}")
+            + "\n\n"
+        )
 
         for m in modules:
             mtype = m.type
@@ -56,12 +72,18 @@ def write_ninja(modules: List[BpModule], out_dir: str, base_path: str):
 
             if mtype.startswith("prebuilt_"):
                 if "src" in props:
-                    f.write(f"build {os.path.join(out_dir, name)}: phony {os.path.realpath(props['src'])}\n")
+                    f.write(
+                        f"build {os.path.join(out_dir, name)}: phony {os.path.realpath(props['src'])}\n"
+                    )
                 continue
 
             for src in srcs:
                 rel_src = os.path.relpath(src, base_path)
-                obj = os.path.normpath(os.path.join(out_dir, f"obj/{name}/{os.path.splitext(rel_src)[0]}.o"))
+                obj = os.path.normpath(
+                    os.path.join(
+                        out_dir, f"obj/{name}/{os.path.splitext(rel_src)[0]}.o"
+                    )
+                )
                 os.makedirs(os.path.dirname(obj), exist_ok=True)
                 f.write(f"build {obj}: cc {os.path.realpath(src)}\n")
                 objs.append(obj)
@@ -99,7 +121,11 @@ def write_ninja(modules: List[BpModule], out_dir: str, base_path: str):
 
             for src in srcs:
                 rel_src = os.path.relpath(src, base_path)
-                obj = os.path.normpath(os.path.join(out_dir, f"obj/{name}/{os.path.splitext(rel_src)[0]}.o"))
+                obj = os.path.normpath(
+                    os.path.join(
+                        out_dir, f"obj/{name}/{os.path.splitext(rel_src)[0]}.o"
+                    )
+                )
                 os.makedirs(os.path.dirname(obj), exist_ok=True)
                 f.write(f"build {obj}: cc {os.path.realpath(src)}\n")
                 objs.append(obj)
@@ -112,7 +138,9 @@ def write_ninja(modules: List[BpModule], out_dir: str, base_path: str):
                 if dep_name in built_libs:
                     deps.append(built_libs[dep_name])
                     libs.append(f"-l{dep_name}")
-                elif dep_name in module_map and module_map[dep_name].type.startswith("prebuilt_"):
+                elif dep_name in module_map and module_map[dep_name].type.startswith(
+                    "prebuilt_"
+                ):
                     deps.append(os.path.join(out_dir, dep_name))
                     libs.append(os.path.join(out_dir, dep_name))
 
@@ -120,7 +148,9 @@ def write_ninja(modules: List[BpModule], out_dir: str, base_path: str):
             f.write(f"build {bin_out}: link {' '.join(objs)} || {' '.join(deps)}\n")
             f.write(f"  libs = {' '.join(libs)}\n\n")
 
-        binaries = [os.path.join(out_dir, m.name) for m in modules if m.type == "cc_binary"]
+        binaries = [
+            os.path.join(out_dir, m.name) for m in modules if m.type == "cc_binary"
+        ]
         if binaries:
             f.write(f"build all: phony {' '.join(binaries)}\n")
             f.write("default all\n")

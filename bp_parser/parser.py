@@ -5,21 +5,23 @@ import ast
 import copy
 from bp_parser.ast import BpModule
 
-VAR_RE = re.compile(r'^([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.*)')
-MOD_RE = re.compile(r'^([a-zA-Z_][a-zA-Z0-9_]*)\s*{$')
+VAR_RE = re.compile(r"^([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.*)")
+MOD_RE = re.compile(r"^([a-zA-Z_][a-zA-Z0-9_]*)\s*{$")
+
 
 def strip_comments(lines):
     in_block = False
     stripped = []
     for line in lines:
         line = line.strip()
-        if '/*' in line:
+        if "/*" in line:
             in_block = True
-        if not in_block and not line.startswith('//'):
+        if not in_block and not line.startswith("//"):
             stripped.append(line)
-        if '*/' in line:
+        if "*/" in line:
             in_block = False
     return stripped
+
 
 def merge_arch_props(base: dict, arch: dict):
     for arch_key, props in arch.items():
@@ -34,8 +36,9 @@ def merge_arch_props(base: dict, arch: dict):
             else:
                 base[k] = v
 
+
 def parse_bp_file(path):
-    with open(path, 'r') as f:
+    with open(path, "r") as f:
         lines = strip_comments(f.readlines())
 
     variables = {}
@@ -67,7 +70,12 @@ def parse_bp_file(path):
                     merge_arch_props(current, current.pop("arch"))
 
                 module = BpModule(module_type, name, current)
-                if module_type in ["cc_binary", "cc_library", "cc_shared_library", "cc_static_library"]:
+                if module_type in [
+                    "cc_binary",
+                    "cc_library",
+                    "cc_shared_library",
+                    "cc_static_library",
+                ]:
                     for k in ("static_libs", "shared_libs"):
                         module.deps.extend(current.get(k, []))
                 modules.append(module)
